@@ -1,28 +1,42 @@
 <template>
+  <NavBar/>
+  <div class="flex h-full bg-slate-100 " id="dashboard">
 
-  <div class="flex h-screen" id="dashboard">
-
-    <div class="mr-8 h-screen w-1/4" id="colDough">
-      <div>
+    <div class="mr-8 w-1/6" id="colDough">
+      <div class="mb-8">
+        <h3>Top 5 Produits</h3>
         <DoughnutChart/>
       </div>
-      <div class="my-8">
+      <div >
+        <h3>Top 5 Régions</h3>
         <DoughnutChart/>
       </div>
     </div>
 
-    <div class="w-3/4 m-auto grid grid-cols-2 gap-4" id="colBar">
-      <div class="space-between">
-        <div><BarChart/></div>
-        <div><BarChart :data="chartData"/></div>
+    <div class="w-3/4 grid grid-cols-2 gap-4" id="colBar">
+      <div class="col">
+        <div class="row">
+            <h3>BarChart CA</h3>
+            <BarChart/>
+        </div>
+        
+        <div class="row">
+          <h3>BarChart Local vs Inter</h3>
+          <BarChart :data="chartData"/>
+        </div>
       </div>
-      <div>
-        <div><MultiLineChart/></div>
-        <div><MultiLineChart/></div>
+
+      <div class="col">
+        <div class="row">
+          <h3>Top 5 Produits</h3>
+          <MultiLineChart/>
+        </div>
+        <div class="row">
+          <h3>Top 5 Régions</h3>
+          <MultiLineChart/>
+        </div>
         
       </div>
-      
-      
       
     </div>
 
@@ -30,6 +44,7 @@
 </template>
 
 <script>
+import NavBar from './components/NavBar.vue'
 import BarChart from './components/BarChart.vue'
 import DoughnutChart from './components/DoughnutChart.vue'
 import MultiLineChart from './components/MultiLineChart.vue'
@@ -39,7 +54,8 @@ export default {
   components: { 
     BarChart,
     DoughnutChart,
-    MultiLineChart
+    MultiLineChart,
+    NavBar
   },
   data(){
     return{
