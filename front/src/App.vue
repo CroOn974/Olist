@@ -4,10 +4,10 @@
 
     <div class="mr-8 h-screen w-1/4" id="colDough">
       <div>
-        <DoughnutChart :width="300" :height="300"/>
+        <DoughnutChart/>
       </div>
       <div class="my-8">
-        <DoughnutChart :width="300" :height="300"/>
+        <DoughnutChart/>
       </div>
     </div>
 

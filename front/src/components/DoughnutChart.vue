@@ -3,8 +3,6 @@
       id="doughnut-chart"
       :options="chartOptions"
       :data="chartData"
-      :width="width"
-      :height="height"
     />
   </template>
   
@@ -18,16 +16,6 @@
     name: 'DoughnutChart',
     components: {
         Doughnut
-    },
-    props: {
-      width: {
-        type: Number,
-        required: true
-      },
-      height: {
-        type: Number,
-        required: true
-      }
     },
     data() {
       return {
