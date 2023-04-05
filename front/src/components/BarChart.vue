@@ -3,8 +3,6 @@
       id="bar-chart"
       :options="chartOptions"
       :data="chartData"
-      :width="width"
-      :height="height"
     />
   </template>
   
@@ -25,7 +23,7 @@
         },
         chartOptions: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
         }
       }
     }

@@ -10,6 +10,7 @@
   "dependencies": {
     "chart.js": "^4.2.1",
     "core-js": "^3.8.3",
+    "daisyui": "^2.51.5",
     "lodash": "^4.17.21",
     "vue": "^3.2.13",
     "vue-chartjs": "^5.2.0"
