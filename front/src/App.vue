@@ -12,7 +12,7 @@
     </div>
 
     <div class="w-3/4 m-auto grid grid-cols-2 gap-4" id="colBar">
-      <div>
+      <div class="space-between">
         <div><BarChart/></div>
         <div><BarChart :data="chartData"/></div>
       </div>

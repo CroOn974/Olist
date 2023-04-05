@@ -22,3 +22,14 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+.env
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+
+# mypy 
+.mypy_cache/ 
