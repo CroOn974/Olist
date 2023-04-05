@@ -1,3 +1,6 @@
+# This is an auto-generated Django model module.
+# You'll have to do the following manually to clean this up:
+#   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
@@ -5,10 +8,19 @@
 from django.db import models
 
 
+class City(models.Model):
+    city_id = models.AutoField(primary_key=True)
+    city_name = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'city'
+
+
 class Customers(models.Model):
     customer_id = models.CharField(primary_key=True, max_length=50)
     customer_unique_id = models.CharField(max_length=50, blank=True, null=True)
-    geolocation_zip_code_prefix = models.ForeignKey('GeolocationNorm', models.DO_NOTHING, db_column='geolocation_zip_code_prefix')
+    geolocation = models.ForeignKey('Geolocation', models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -16,7 +28,7 @@ class Customers(models.Model):
 
 
 class Files(models.Model):
-    id_file = models.AutoField(primary_key=True)
+    id_file = models.IntegerField(primary_key=True)
     file = models.CharField(max_length=50, blank=True, null=True)
     file_date = models.DateTimeField(blank=True, null=True)
 
@@ -26,26 +38,13 @@ class Files(models.Model):
 
 
 class Geolocation(models.Model):
-    id_geolocation = models.AutoField(primary_key=True)
-    geolocation_zip_code_prefix = models.CharField(max_length=50, blank=True, null=True)
-    geolocation_lat = models.DecimalField(max_digits=20, decimal_places=17, blank=True, null=True)
-    geolocation_lng = models.DecimalField(max_digits=20, decimal_places=17, blank=True, null=True)
-    geolocation_city = models.CharField(max_length=255, blank=True, null=True)
-    geolocation_state = models.CharField(max_length=50, blank=True, null=True)
+    geolocation_id = models.IntegerField(primary_key=True)
+    state = models.ForeignKey('State', models.DO_NOTHING)
+    city = models.ForeignKey(City, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'geolocation'
-
-
-class GeolocationNorm(models.Model):
-    geolocation_zip_code_prefix = models.CharField(primary_key=True, max_length=50)
-    geolocation_city = models.CharField(max_length=50, blank=True, null=True)
-    geolocation_state = models.CharField(max_length=50, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'geolocation_norm'
 
 
 class OrderItem(models.Model):
@@ -124,9 +123,17 @@ class Reviews(models.Model):
 
 class Sellers(models.Model):
     seller_id = models.CharField(primary_key=True, max_length=50)
-    geolocation_zip_code_prefix = models.ForeignKey(GeolocationNorm, models.DO_NOTHING, db_column='geolocation_zip_code_prefix')
+    geolocation = models.ForeignKey(Geolocation, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'sellers'
 
+
+class State(models.Model):
+    state_id = models.AutoField(primary_key=True)
+    state_name = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'state'
