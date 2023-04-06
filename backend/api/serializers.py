@@ -7,13 +7,19 @@ class FilesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class OrderItemSerializer(serializers.ModelSerializer):
+class SoldProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ('product_id', 'quantity', 'total')
 
 
-class GeolocationNormSerializer(serializers.ModelSerializer):
+class CaStateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Geolocation
+        model = OrderItem
         fiels = ('state', 'quantity', 'total')
+
+
+class EvoStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fiels = ('state', 'ca', 'year')
