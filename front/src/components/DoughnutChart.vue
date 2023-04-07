@@ -1,38 +1,32 @@
 <template>
-    <Doughnut
-      id="doughnut-chart"
-      :options="chartOptions"
-      :data="chartData"
-    />
-  </template>
+    <div class="">
+        <v-chart class="chart w-auto h-80" :option="option" autoresize />
+    </div>
+</template>
   
-  <script>
-  import { Doughnut } from 'vue-chartjs'
-  import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+<script setup props="option">
+    import { use } from 'echarts/core';
+    import { CanvasRenderer } from 'echarts/renderers';
+    import { PieChart } from 'echarts/charts';
+    import {
+        TitleComponent,
+        TooltipComponent,
+    } from 'echarts/components';
+    import VChart, { THEME_KEY } from 'vue-echarts';
+    import { provide } from 'vue';
+    
+    use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent]);
+    
+    provide(THEME_KEY, 'echarts');
+</script>
 
-  ChartJS.register(ArcElement, Tooltip, Legend)
-
-  export default {
-    name: 'DoughnutChart',
-    components: {
-        Doughnut
-    },
-    data() {
-      return {
-        chartData: {
-            labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
-            datasets: [
-                {
-                backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-                data: [40, 20, 80, 10]
-                }
-            ]
-        },
-        chartOptions: {
-            responsive: true,
-            maintainAspectRatio: true
+<script>
+    export default {
+        name:'DoughnutChart',
+        props:{
+            option:{
+                type: Object,
+            }
         }
-      }
     }
-  }
-  </script>
+</script>
