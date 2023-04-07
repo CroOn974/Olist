@@ -33,7 +33,10 @@
           <h3>Top 5 Régions</h3>
           <MultiLineChart/>
         </div>
-        
+        <div class="row">
+          <h3>Top 5 Régions</h3>
+          <MapChart/>
+        </div>
       </div>
       
     </div>
@@ -47,6 +50,7 @@ import NavBar from '../components/NavBar.vue'
 import BarChart from '../components/BarChart.vue'
 import DoughnutChart from '../components/DoughnutChart.vue'
 import MultiLineChart from '../components/MultiLineChart.vue'
+import MapChart from '@/components/MapChart.vue'
 
 export default {
   name: 'HomeView',
@@ -54,7 +58,8 @@ export default {
     BarChart,
     DoughnutChart,
     MultiLineChart,
-    NavBar
+    NavBar,
+    MapChart
   },
   data(){
     return{

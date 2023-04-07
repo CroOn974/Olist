@@ -11,6 +11,7 @@ from django.db import models
 class City(models.Model):
     city_id = models.AutoField(primary_key=True)
     city_name = models.CharField(max_length=50, blank=True, null=True)
+    state = models.ForeignKey('State', models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -20,7 +21,7 @@ class City(models.Model):
 class Customers(models.Model):
     customer_id = models.CharField(primary_key=True, max_length=50)
     customer_unique_id = models.CharField(max_length=50, blank=True, null=True)
-    geolocation = models.ForeignKey('Geolocation', models.DO_NOTHING)
+    city = models.ForeignKey(City, models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -28,23 +29,13 @@ class Customers(models.Model):
 
 
 class Files(models.Model):
-    id_file = models.IntegerField(primary_key=True)
+    id_file = models.AutoField(primary_key=True)
     file = models.CharField(max_length=50, blank=True, null=True)
     file_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'files'
-
-
-class Geolocation(models.Model):
-    geolocation_id = models.IntegerField(primary_key=True)
-    state = models.ForeignKey('State', models.DO_NOTHING)
-    city = models.ForeignKey(City, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'geolocation'
 
 
 class OrderItem(models.Model):
@@ -123,7 +114,7 @@ class Reviews(models.Model):
 
 class Sellers(models.Model):
     seller_id = models.CharField(primary_key=True, max_length=50)
-    geolocation = models.ForeignKey(Geolocation, models.DO_NOTHING)
+    city = models.ForeignKey(City, models.DO_NOTHING)
 
     class Meta:
         managed = False

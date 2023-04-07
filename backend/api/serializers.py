@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Files ,Geolocation ,OrderItem
+from .models import Files,OrderItem,State,Products
 
 class FilesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,19 +7,32 @@ class FilesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SoldProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ('product_id', 'quantity', 'total')
+class SoldProductSerializer(serializers.Serializer):
+    product_id = serializers.CharField()
+    turnover = serializers.IntegerField()
+    quantity = serializers.IntegerField()
 
-
-class CaStateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderItem
-        fiels = ('state', 'quantity', 'total')
+        model = Products
+        fields = ['product_id', 'turnover', 'quantity']
+
+class CaStateSerializer(serializers.Serializer):
+    state_name = serializers.CharField()
+    turnover = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+
+    class Meta:
+        model = State
+        fields = ['state_name', 'turnover', 'quantity']
 
 
 class EvoStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fiels = ('state', 'ca', 'year')
+        fiels = ('state', 'quantity', 'turnover', 'year')
+
+
+class EvoProduitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fiels = ('product_id', 'quantity', 'turnover', 'year')
