@@ -1,59 +1,20 @@
 <template>
-<div class="container h-screen">
-  <NavBar/>
-  <div class="flex bg-slate-100 " id="dashboard">
-    <div class="mr-8 w-1/3 h-auto" id="colDough">
-      <div class="">
-        <DoughnutChart :option="option_pie_1"/>
-      </div>
-      <div >
-        <DoughnutChart :option="option_pie_2"/>
-      </div>
-    </div>
-
-    <div class="w-3/4 grid grid-cols-2 gap-4" id="colBar">
-      <div class="col">
-        <div class="row">
-            <h3>BarChart CA</h3>
-            <BarChart/>
-        </div>
-        
-        <div class="row">
-          <h3>BarChart Local vs Inter</h3>
-          <BarChart :data="chartData"/>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="row">
-          <h3>Top 5 Produits</h3>
-          <MultiLineChart/>
-        </div>
-        <div class="row">
-          <h3>Top 5 Régions</h3>
-          <MultiLineChart/>
-        </div>
-        
-      </div>
-      
-    </div>
+  <div class="container h-screen">
+    <NavBar/>
+    <MapChart/>
 
   </div>
-</div>
 </template>
 
 <script>
 import NavBar from '../components/NavBar.vue'
-import BarChart from '../components/BarChart.vue'
-import DoughnutChart from '../components/DoughnutChart.vue'
-import MultiLineChart from '../components/MultiLineChart.vue'
+import MapChart from '../components/MapChart.vue'
+
 
 export default {
-  name: 'HomeView',
+  name: 'MapView',
   components: { 
-    BarChart,
-    DoughnutChart,
-    MultiLineChart,
+    MapChart,
     NavBar
   },
   data(){
