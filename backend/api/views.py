@@ -2,7 +2,7 @@ from api.models import Files,OrderItem
 from django.db.models import Count, F, Sum
 # API
 from rest_framework import generics
-from api.serializers import CaStateSerializer, FilesSerializer, SoldProductSerializer, EvoStateSerializer, EvoProduitSerializer
+from api.serializers import CaStateSerializer, FilesSerializer, SoldProductSerializer, EvoStateSerializer, EvoProductSerializer
 from rest_framework.response import Response
 from rest_framework import viewsets
 
@@ -112,44 +112,38 @@ class EvoState(viewsets.ReadOnlyModelViewSet):
 #
 class EvoProduct(viewsets.ReadOnlyModelViewSet):
 
-    serializer_class = EvoProduitSerializer
+    serializer_class = EvoProductSerializer
+    queryset = OrderItem.objects.none()  # an empty queryset
 
-    # def list(self, request, product):
-    #     evo_product = OrderItem.objects\
-    #     .filter(order__product__product_id=product)\
-    #     .values('order__product__product_id','order__order_purchase_timestamp__year')\
-    #     .annotate(quantity=Count('order_item_quantity'),turnover=Count(F('price')*F('order_item_quantity')))\
-    #     .order_by('order__product__product_id')
+    def list(self, request, product):
+        product_list = product.split(',')
+        print(product_list)
+        evo_product = OrderItem.objects\
+            .filter(product__product_id__in=product_list) \
+            .values('product_id__product_id','order__order_purchase_timestamp__year')\
+            .annotate(product=F('product_id__product_id'),year=F('order__order_purchase_timestamp__year'),quantity=Count('order_item_quantity'),turnover=Sum(F('price')*F('order_item_quantity')))\
+            .order_by('product_id__product_id', 'order__order_purchase_timestamp__year')
         
-    #     serializer = self.serializer_class(evo_product, many=True)
-    #     return Response(serializer.data)
-    
+        for item in evo_product:
+            print(item)
 
 
+        product_dict = {}
+        for item in evo_product:
+            print(item)
+            product = item['product']
+            data = {
+                'quantity': item['quantity'],
+                'turnover': item['turnover'],
+                'year': item['year'],
+            }
+            if product not in product_dict:
+                product_dict[product] = {'product': product, 'data': [data]}
+            else:
+                product_dict[product]['data'].append(data)
 
+        product_list = list(product_dict.values())
 
+        serializer = self.serializer_class(product_list, many=True)
+        return Response(serializer.data)
 
-
-            # if year is None and limit is None:
-        #     sales_by_state = OrderItem.objects\
-        #         .values('order__order_item__sellers__city__state__state_id__state_name')\
-        #         .annotate(quantity=Count('order_item_quantity'),turnover=Count(F('price')*F('order_item_quantity')))\
-        #         .order_by('-total')
-
-        # # Cas ou Il n'y a que l'années
-        # elif year is None:
-        #     sales_by_state = OrderItem.objects\
-        #         .values('order__order_item__sellers__city__state__state_id__state_name')\
-        #         .annotate(quantity=Count('order_item_quantity'),turnover=Count(F('price')*F('order_item_quantity')))\
-        #         .order_by('-total')[:limit]
-
-        # # Cas ou Il n'y a que la limite
-        # elif limit is None:
-        #     sales_by_state = OrderItem.objects\
-        #         .filter(order__order_purchase_timestamp__year=year)\
-        #         .values('order__order_item__sellers__city__state__state_id__state_name')\
-        #         .annotate(quantity=Count('order_item_quantity'),turnover=Count(F('price')*F('order_item_quantity')))\
-        #         .order_by('-total')
-
-        # # Cas ou il y a les deux parametres
-        # else:
