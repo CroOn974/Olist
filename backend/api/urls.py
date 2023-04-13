@@ -8,8 +8,10 @@ product.register(r'product-year/(?:(?P<year>\d{4})(?:/(?P<limit>\d{1}))?)?', Pro
 state = DefaultRouter()
 state.register(r'state-year/(?:(?P<year>\d{4})(?:/(?P<limit>\d{1}))?)?', StateByYearViewSet, basename= 'state-year')
 
-evoState = DefaultRouter()
-evoState.register(r'state-evo/(?P<state>([A-Z]{2},)*[A-Z]{2})/', EvoState, basename= 'evo-state')
+# evoState = DefaultRouter()
+# evoState.register(r'states-evo/<str:states>/', EvoState, basename='evo-state')
+evoState_router = DefaultRouter()
+evoState_router.register(r'', EvoState, basename='evo-state')
 
 evoProduct = DefaultRouter()
 evoProduct.register(r'product-evo/(?P<product>([A-Z]{2},)*[A-Z]{2})/', EvoState, basename= 'evo-product')
@@ -17,7 +19,8 @@ evoProduct.register(r'product-evo/(?P<product>([A-Z]{2},)*[A-Z]{2})/', EvoState,
 urlpatterns = [
     path('', include(product.urls)),
     path('', include(state.urls)),
-    path('', include(evoState.urls)),
+    # path('', include(evoState.urls)),
+    path('states-evo/<str:states>/', include(evoState_router.urls)),
     path('', include(evoProduct.urls))
 
 ]
