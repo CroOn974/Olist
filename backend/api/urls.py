@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from api.views import ProductByYearViewSet, StateByYearViewSet, EvoState, EvoProduct
+from api.views import ProductByYearViewSet, StateByYearViewSet, EvoState, EvoProduct, importCsv
 
 product = DefaultRouter()
 product.register(r'product-year/(?:(?P<year>\d{4})(?:/(?P<limit>\d{1}))?)?', ProductByYearViewSet, basename= 'product-year')
@@ -19,6 +19,7 @@ urlpatterns = [
     path('', include(state.urls)),
     path('states-evo/<str:states>/', include(evoState.urls)),
     path('product-evo/<str:product>/', include(evoProduct.urls)),
+    path('import', importCsv, name="importcsv"),
 
 
 ]
