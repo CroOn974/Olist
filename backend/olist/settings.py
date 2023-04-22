@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'olist.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'olist',
+        'NAME': 'olist2',
         'USER': 'postgres',
         'PASSWORD': '0000',
         'HOST': 'localhost',
