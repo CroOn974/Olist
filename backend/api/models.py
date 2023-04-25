@@ -70,7 +70,7 @@ class OrderPlaced(models.Model):
 
 
 class Payments(models.Model):
-    payments_id = models.CharField(primary_key=True, max_length=50)
+    payments_id = models.AutoField(primary_key=True)
     payment_sequential = models.IntegerField(blank=True, null=True)
     payment_type = models.CharField(max_length=50, blank=True, null=True)
     payment_installments = models.IntegerField(blank=True, null=True)
@@ -101,8 +101,8 @@ class Products(models.Model):
 class Reviews(models.Model):
     review_id = models.CharField(primary_key=True, max_length=50)
     review_score = models.IntegerField(blank=True, null=True)
-    review_comment_title = models.CharField(max_length=50, blank=True, null=True)
-    review_comment_message = models.CharField(max_length=50, blank=True, null=True)
+    review_comment_title = models.CharField(max_length=255, blank=True, null=True)
+    review_comment_message = models.CharField(max_length=2000, blank=True, null=True)
     review_creation_date = models.DateTimeField(blank=True, null=True)
     review_answer_timestamp = models.DateTimeField(blank=True, null=True)
     order = models.ForeignKey(OrderPlaced, models.DO_NOTHING)
