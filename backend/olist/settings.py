@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'olist.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'olist2',
+        'NAME': 'olist',
         'USER': 'postgres',
         'PASSWORD': '0000',
         'HOST': 'localhost',
@@ -129,7 +129,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
