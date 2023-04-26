@@ -75,7 +75,7 @@ class StateByYearViewSet(viewsets.ReadOnlyModelViewSet):
 
 ##
 # Renvoye l'evolution des region passé en paramettre
-# EndPoint -> http://localhost:8000/api/evo-state/<state>/ |ex| http://localhost:8000/api/evo-state/<1>,<2>,<3>/
+# EndPoint -> http://localhost:8000/api/states-evo/<state>/ |ex| http://localhost:8000/api/states-evo/<1>,<2>,<3>/
 #
 class EvoState(viewsets.ReadOnlyModelViewSet):
     serializer_class = EvoStateSerializer
@@ -111,7 +111,7 @@ class EvoState(viewsets.ReadOnlyModelViewSet):
 
 ##
 # Renvoye l'evolution des produits passé en paramettre
-# EndPoint -> http://localhost:8000/api/evo-product/<produit>/ |ex| http://localhost:8000/api/evo-product/<1>,<2>,<3>/
+# EndPoint -> http://localhost:8000/api/product-evo/<produit>/ |ex| http://localhost:8000/api/product-evo/<1>,<2>,<3>/
 #
 class EvoProduct(viewsets.ReadOnlyModelViewSet):
 
