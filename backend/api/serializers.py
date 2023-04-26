@@ -27,12 +27,18 @@ class CaStateSerializer(serializers.Serializer):
 
 
 class EvoStateSerializer(serializers.ModelSerializer):
+    state_name = serializers.CharField()
+    data = serializers.CharField()
+
     class Meta:
         model = OrderItem
-        fiels = ('state', 'quantity', 'turnover', 'year')
+        fields = ['state_name', 'data']
 
 
-class EvoProduitSerializer(serializers.ModelSerializer):
+class EvoProductSerializer(serializers.ModelSerializer):
+    product = serializers.CharField()
+    data = serializers.CharField()
+
     class Meta:
         model = OrderItem
-        fiels = ('product_id', 'quantity', 'turnover', 'year')
+        fields = ['product', 'data']

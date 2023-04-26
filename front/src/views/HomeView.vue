@@ -1,10 +1,17 @@
 <template>
 <div class="container overflow-hidden">
   <NavBar/>
-  <div class="flex h-screen ">
-    <div class="w-1/4 h-full my-auto">
-      <PieChart class="h-1/2 pb-2" :option="option_pie_1"/>
-      <PieChart class="h-1/2 pt-2" :option="option_pie_2"/>
+  <div class="flex bg-slate-100 " id="dashboard">
+    <select v-model="selectedYear" @change="updateDash()">
+      <option v-for="year in years" :value="year" :key="year">{{ year }}</option>
+    </select>
+    <div class="mr-8 w-1/3 h-auto" id="colDough">
+      <div class="">
+        <DoughnutChart :option="option_pie_1"/>
+      </div>
+      <div >
+        <DoughnutChart :option="option_pie_2"/>
+      </div>
     </div>
 
     <div class="w-1/4 my-auto mx-4 space-y-4">
@@ -40,7 +47,12 @@ export default {
     MapChart
   },
   data(){
-    return {
+    return{
+      selectedYear: '',
+      years: ['2017', '2018', '2019'],
+      limit: '5',
+      listState : [],
+      listProduct : [],
       option_pie_1: {
         title: {
           text: 'Top 5 Régions',
@@ -51,9 +63,15 @@ export default {
           {
             name: 'Access From',
             type: 'pie',
-            radius: [ '20%', '40%'],
-            label:{
-              color: "#fff",
+            radius: ['40%', '70%'],
+            center: ['50%', '50%'],
+            data: [],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
             },
             emphasis: {
               label: {
@@ -92,11 +110,7 @@ export default {
               color: "#fff",
             },
             data: [
-              { value: 335, name: 'Direct' },
-              { value: 310, name: 'Email' },
-              { value: 234, name: 'Ad Networks' },
-              { value: 135, name: 'Video Ads' },
-              { value: 1548, name: 'Search Engines' },
+              
             ],
             emphasis: {
               label: {
@@ -348,6 +362,60 @@ export default {
         ]
       }
     }
+  }
+  ,
+  /**
+   * Récupère des données
+   * 
+   * 
+   */
+  async created(){
+    
+  },
+  methods: {
+    updateDash(){
+      this.topState(this.selectedYear, this.limit)
+      this.topProduct(this.selectedYear, this.limit)
+    },
+    async topState(year, limit){
+      
+      var response = await fetch('http://localhost:8000/api/state-year/'+year+'/'+limit+'');
+      let data = await response.json();
+
+      this.option_pie_2.series[0].data = data.map((item) => {
+        return { value: item.turnover, name: item.state_name };
+      });
+
+      this.listState = data.map((item) => item.state_name);
+      this.evoState()
+
+    },
+    async topProduct(year, limit){
+
+      var response = await fetch('http://localhost:8000/api/product-year/'+year+'/'+limit+'');
+      let data = await response.json();
+      
+      this.option_pie_1.series[0].data = data.map((item) => {
+        return { value: item.turnover, name: item.product_id };
+      });
+
+      this.listProduct = data.map((item) => item.product_id);
+      this.evoProduct()
+    },
+    async evoState(){
+      const states = this.listState.join(',');
+      var response = await fetch('http://localhost:8000/api/states-evo/'+states+'/');
+      let data = await response.json();
+      console.log(data)
+    },    
+    async evoProduct(){
+      const product = this.listProduct.join(',');
+      var response = await fetch('http://localhost:8000/api/product-evo/'+product+'/');
+      let data = await response.json();
+      console.log(data)
+    }, 
+    
+
   }
 }
 </script>
