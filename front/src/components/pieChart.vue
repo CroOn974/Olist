@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <v-chart class="chart w-auto h-80" :option="option" autoresize />
+        <v-chart class="chart w-auto " :option="option" autoresize=false />
     </div>
 </template>
   
@@ -17,12 +17,12 @@
     
     use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent]);
     
-    provide(THEME_KEY, 'echarts');
+    provide(THEME_KEY, 'dark');
 </script>
 
 <script>
     export default {
-        name:'DoughnutChart',
+        name:'PieChart',
         props:{
             option:{
                 type: Object,

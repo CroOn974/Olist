@@ -1,40 +1,29 @@
 <template>
-  <Line :data="chartData" :options="chartOptions" />
+  <div class="">
+      <v-chart class="chart h-80 bg-slate-50" :option="option" :autoresize=false />
+  </div>
 </template>
+
+<script setup props="option">
+  import { use } from 'echarts/core';
+  import { CanvasRenderer } from 'echarts/renderers';
+  import { LineChart } from 'echarts/charts';
+  import { TitleComponent, GridComponent, TooltipComponent, ToolboxComponent } from 'echarts/components';
+  import VChart, { THEME_KEY } from 'vue-echarts';
+  import { provide } from 'vue';
   
+  use([ CanvasRenderer, LineChart, TitleComponent, TooltipComponent, GridComponent, ToolboxComponent ]);
+  
+  provide(THEME_KEY, 'dark');
+</script>
+
 <script>
   export default {
-    name: 'MultiLineChart',
-    components: { 
-      
-     },
-    data() {
-      return {
-        chartData: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-          datasets: [
-            {
-              label: 'Data One',
-              backgroundColor: '#FF5733',
-              data: [40, 39, 10, 40, 39, 80, 40],
-            },
-            {
-              label: 'Data Two',
-              backgroundColor: '#0047AB',
-              data: [4, 90, 15, 24, 80, 12, 40],
-            },
-            {
-              label: 'Data Three',
-              backgroundColor: '#00A36C',
-              data: [20, 19, 40, 50, 30, 70, 45],
-            },
-          ],
-        },
-        chartOptions: {
-          responsive: true,
-          maintainAspectRatio: true,
-        }
+      name:'multiLineChart',
+      props:{
+          option:{
+              type: Object,
+          }
       }
-    }
   }
-  </script>
+</script>

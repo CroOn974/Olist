@@ -1,9 +1,13 @@
 <template>
-  <div id="container" style="height: 500px;"></div>
+  <div id="container" class="bg-slate-50" style="height: 500px;"></div>
 </template>
 
 <script>
 import * as echarts from 'echarts';
+import { THEME_KEY } from 'vue-echarts';
+import { provide } from 'vue';
+
+provide(THEME_KEY, 'dark');
 
 export default {
   name : 'MapChart',

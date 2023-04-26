@@ -1,29 +1,29 @@
 <template>
-    <Bar
-      id="bar-chart"
-      :options="chartOptions"
-      :data="chartData"
-    />
-  </template>
+  <div class="">
+      <v-chart class="chart h-80 bg-slate-50" :option="option" :autoresize=false />
+  </div>
+</template>
+
+<script setup props="option">
+  import { use } from 'echarts/core';
+  import { CanvasRenderer } from 'echarts/renderers';
+  import { BarChart } from 'echarts/charts';
+  import { TitleComponent, GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
+  import VChart, { THEME_KEY } from 'vue-echarts';
+  import { provide } from 'vue';
   
-  <script>
+  use([ CanvasRenderer, BarChart, TitleComponent, TooltipComponent, GridComponent, LegendComponent ]);
   
+  provide(THEME_KEY, 'dark');
+</script>
+
+<script>
   export default {
-    name: 'BarChart',
-    components: { 
-      
-     },
-    data() {
-      return {
-        chartData: {
-          labels: [ 'January', 'February', 'March' ],
-          datasets: [ { data: [40, 20, 12] } ]
-        },
-        chartOptions: {
-            responsive: true,
-            maintainAspectRatio: true,
-        }
+      name:'barChart',
+      props:{
+          option:{
+              type: Object,
+          }
       }
-    }
   }
-  </script>
+</script>
