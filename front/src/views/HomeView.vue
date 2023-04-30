@@ -15,33 +15,7 @@
     </div>
 
     <div class="w-3/4 grid grid-cols-2 gap-4" id="colBar">
-      <div class="col">
-        <div class="row">
-            <h3>BarChart CA</h3>
-            <BarChart/>
-        </div>
-        
-        <div class="row">
-          <h3>BarChart Local vs Inter</h3>
-          <BarChart :data="chartData"/>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="row">
-          <h3>Top 5 Produits</h3>
-          <MultiLineChart/>
-        </div>
-        <div class="row">
-          <h3>Top 5 Régions</h3>
-          <MultiLineChart/>
-        </div>
-        <div class="row">
-          <h3>Top 5 Régions</h3>
-          <MapChart/>
-        </div>
-      </div>
-      
+      <BarChart :option="barChartOptions" />
     </div>
 
   </div>
@@ -50,19 +24,15 @@
 
 <script>
 import NavBar from '../components/NavBar.vue'
-import BarChart from '../components/BarChart.vue'
 import DoughnutChart from '../components/DoughnutChart.vue'
-import MultiLineChart from '../components/MultiLineChart.vue'
-import MapChart from '@/components/MapChart.vue'
+import BarChart from '../components/BarChart.vue'
 
 export default {
   name: 'HomeView',
   components: { 
-    BarChart,
     DoughnutChart,
-    MultiLineChart,
     NavBar,
-    MapChart
+    BarChart
   },
   data(){
     return{
@@ -125,7 +95,19 @@ export default {
           },
         ],
       },
-      
+      dataState:[],
+      dataProduct:[],
+      barChartOptions: {
+        // les options du graphique
+        title: {
+          text: 'Mon graphique à barres'
+        },
+        xAxis: {
+          data: []
+        },
+        yAxis: {},
+        series: []
+      }
     }
   }
   ,
@@ -172,14 +154,17 @@ export default {
       var response = await fetch('http://localhost:8000/api/states-evo/'+states+'/');
       let data = await response.json();
       console.log(data)
+      this.dataState = data
+      
+
     },    
     async evoProduct(){
       const product = this.listProduct.join(',');
       var response = await fetch('http://localhost:8000/api/product-evo/'+product+'/');
       let data = await response.json();
       console.log(data)
-    }, 
-    
+      this.dataProduct = data
+    },
 
   }
 }
