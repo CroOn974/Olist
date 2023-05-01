@@ -1,55 +1,83 @@
 <template>
-<div class="container h-screen">
-  <NavBar/>
-  <div class="flex bg-slate-100 " id="dashboard">
-    <select v-model="selectedYear" @change="updateDash()">
-      <option v-for="year in years" :value="year" :key="year">{{ year }}</option>
-    </select>
-    <div class="mr-8 w-1/3 h-auto" id="colDough">
-      <div class="">
-        <DoughnutChart :option="option_pie_1"/>
-      </div>
-      <div >
+
+  <!-- MAIN CONTAINER  -->
+  <div class="container bg-slate-900 h-screen overflow-y-hidden">
+
+    <NavBar/>
+
+    <!-- DASHBOARD CONTAINER -->
+    <div class="flex flex-nowrap overflow-x-scroll min-w-full overflow-y-hidden" id="dashboard">
+
+      <!-- COLONNE 1 -->
+      <div class="w-1/4 h-full flex-shrink-0" id="colDough">
+        <!-- SELECT ANNEE -->
+        <select class="w-48 h-8 m-4 rounded-xl" v-model="selectedYear" @change="updateDash()">
+          <option v-for="year in years" :value="year" :key="year">{{ year }}</option>
+        </select>
+        <DoughnutChart class="" :option="option_pie_1"/>
         <DoughnutChart :option="option_pie_2"/>
       </div>
-    </div>
 
-    <div class="w-3/4 grid grid-cols-2 gap-4" id="colBar">
-      <div class="col">
-        <div class="row">
-            <h3>BarChart CA</h3>
-            <BarChart/>
+      <!-- COLONNE 2 -->
+      <div class="w-1/2 flex-shrink-0 bg-slate-800">
+        <div class="h-64 pt-8 border-b-2 border-b-slate-500">
+          <BarChart :option="option_multibar_1"/>
         </div>
-        
-        <div class="row">
-          <h3>BarChart Local vs Inter</h3>
-          <BarChart :data="chartData"/>
+        <div class="h-48 my-4 border-b-2 border-b-slate-500">
+          <MultiLineChart class="" :option="option_multiline_1"/>
+        </div>
+        <div class="h-48 mt-4">
+          <MultiLineChart class="" :option="option_multiline_1"/>
         </div>
       </div>
 
-      <div class="col">
-        <div class="row">
-          <h3>Top 5 Produits</h3>
-          <MultiLineChart/>
+      <!-- COLONNE 3 -->
+      <div class="w-1/4 mx-4 flex-shrink-0">
+        <!-- Panier Moyen & marge + coûts -->
+        <div class="h-48 mt-8 mx-4 rounded-lg shadow-lg border-2 border-slate-500 ">
+          <div class="grid grid-cols-2 h-full">
+            <div class="rounded-lg p-4">
+              <p class="text-gray-50 font-medium mb-8">Panier Moyen</p>
+              <p class="text-gray-50 text-5xl text-center">999 €</p>
+            </div>
+            <div class="grid grid-rows-2">
+              <div class="p-2 border-b-4 border-b-blue-500 border-l-4 border-l-green-400">
+                <p class="text-gray-50 mb-2 font-medium">Bénéfices</p>
+                <p class="text-gray-50 text-3xl text-center">30 €</p>
+              </div>
+              <div class="p-2 border-l-4 border-orange-500">
+                <p class="text-gray-50 mb-2 font-medium">Coûts</p>
+                <p class="text-gray-50 text-3xl text-center">969 €</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row">
-          <h3>Top 5 Régions</h3>
-          <MultiLineChart/>
+        <!-- Nombre nouveau clients & nouveaux rebonds -->
+        <div class="h-48 my-8">
+          <div class="grid grid-cols-2">
+            <div class="mx-4 rounded-lg shadow-lg border-2 border-green-300 h-48 p-4">
+              <p class="text-gray-50">Nouveaux Clients</p>
+              <p class="text-gray-50 text-7xl text-center mt-6">999</p>
+            </div>
+            <div class="mx-4 rounded-lg shadow-lg border-2 border-blue-500 h-48 pt-4">
+              <p class="text-gray-50 text-center">Rebonds</p>
+              <p class="text-gray-50 text-7xl text-center mt-6">999</p>
+            </div>
+          </div>
         </div>
-        <div class="row">
-          <h3>Top 5 Régions</h3>
-          <MapChart/>
-        </div>
+        <BarChart :option="option_bar_2"/>
       </div>
-      
-    </div>
 
+      <!-- COLONNE 4 -->
+      <div class="w-1/4 flex-shrink-0  bg-slate-800">
+        <MapChart class="h-full"/>
+      </div>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
-import NavBar from '../components/NavBar.vue'
+// import NavBar from '../components/NavBar.vue'
 import BarChart from '../components/BarChart.vue'
 import DoughnutChart from '../components/DoughnutChart.vue'
 import MultiLineChart from '../components/MultiLineChart.vue'
@@ -61,7 +89,7 @@ export default {
     BarChart,
     DoughnutChart,
     MultiLineChart,
-    NavBar,
+    // NavBar,
     MapChart
   },
   data(){
@@ -71,10 +99,99 @@ export default {
       limit: '5',
       listState : [],
       listProduct : [],
+      option_bar_1 : {
+        title: {
+          text: 'Top 5 Produits',
+          left: 'center',
+          top:'5%',
+          textStyle: {
+            color: "#fff",
+          },
+        },
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          axisLabel:{
+            color:'#FFF'
+          }
+        },
+        yAxis: {
+          show: false
+        },
+        series: [
+          {
+            data: [120, 200, 150, 80, 70, 110, 130],
+            type: 'bar',
+            itemStyle: {
+              borderRadius: [30, 30, 0, 0]
+            },
+            label: {
+              show: true,
+              position: "top",
+              distance: 15,
+              color: "#fff",
+              fontSize: 10,
+            }
+          }
+        ]
+      },
+      option_bar_2 : {
+        title: {
+          text: 'local VS inter',
+          left: 'center',
+          top:'2%',
+          textStyle: {
+            color: "#fff",
+          },
+        },
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+          axisLabel:{
+            color:'#FFF'
+          }
+        },
+        yAxis: {
+          show: false
+        },
+        series: [
+          {
+            data: [120, 200, 150, 80, 70],
+            type: 'bar',
+            itemStyle: {
+              borderRadius: [30, 30, 0, 0]
+            },
+            label: {
+              show: true,
+              position: "top",
+              distance: 15,
+              color: "#fff",
+              fontSize: 10,
+            }
+          },
+          {
+            data: [99, 53, 128, 87, 192],
+            type: 'bar',
+            itemStyle: {
+              borderRadius: [30, 30, 0, 0]
+            },
+            label: {
+              show: true,
+              position: "top",
+              distance: 15,
+              color: "#fff",
+              fontSize: 10,
+            }
+          }
+        ]
+      },
       option_pie_1: {
         title: {
           text: 'Top 5 Produits',
           left: 'center',
+          textStyle: {
+            color: "#fff",
+          },
         },
         tooltip: {
           trigger: 'item',
@@ -87,6 +204,9 @@ export default {
             radius: ['40%', '70%'],
             center: ['50%', '50%'],
             data: [],
+            label: {
+              color: '#fff'
+            },
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -101,6 +221,9 @@ export default {
         title: {
           text: 'Top 5 Régions',
           left: 'center',
+          textStyle: {
+            color: "#fff",
+          },
         },
         tooltip: {
           trigger: 'item',
@@ -115,6 +238,9 @@ export default {
             data: [
               
             ],
+            label: {
+              color: '#fff'
+            },
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -125,6 +251,184 @@ export default {
           },
         ],
       },
+      option_multibar_1 : {
+            title: {
+              text: 'Top 5 Produits',
+              left: '2%',
+              top:'2%',
+              textStyle: {
+                color: "#fff",
+              },
+            },
+            legend: {
+              data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+              left: '0%',
+              top:'center',
+              orient: 'vertical'
+            },
+            xAxis: {
+              type: 'category',
+              data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+              axisLabel:{
+                  color:'#FFF'
+                }
+            },
+            yAxis: {
+              show: false
+            },
+            grid: {
+              containLabel: true
+            },
+            series: [
+            {
+              type: 'bar',
+              data: [44, 46, 49, 52, 55],
+              barWidth: 15,
+              itemStyle: {
+                barBorderRadius: [30, 30, 0, 0]
+              },
+              label: {
+                show: true,
+                position: "top",
+                distance: 15,
+                color: "#fff",
+                fontSize: 10,
+              }
+            },
+            {
+              type: 'bar',
+              data: [58, 62, 65, 61, 59],
+              barWidth: 15,
+              itemStyle: {
+                barBorderRadius: [30, 30, 0, 0]
+              },
+              label: {
+                show: true,
+                position: "top",
+                distance: 15,
+                color: "#fff",
+                fontSize: 10,
+              }
+            },
+            {
+              type: 'bar',
+              data: [33, 27, 29, 35, 39],
+              barWidth: 15,
+              itemStyle: {
+                barBorderRadius: [30, 30, 0, 0]
+              },
+              label: {
+                show: true,
+                position: "top",
+                distance: 15,
+                color: "#fff",
+                fontSize: 10,
+              }
+            },
+            {
+              type: 'bar',
+              data: [16, 19, 14, 20, 22],
+              barWidth: 15,
+              itemStyle: {
+                borderRadius: [30, 30, 0, 0]
+              },
+              label: {
+                show: true,
+                position: "top",
+                distance: 15,
+                color: "#fff",
+                fontSize: 10,
+              }
+            },
+            {
+              type: 'bar',
+              data: [65, 78, 81, 90, 54],
+              barWidth: 15,
+              itemStyle: {
+                barBorderRadius: [30, 30, 0, 0]
+              },
+              label: {
+                show: true,
+                position: "top",
+                distance: 15,
+                color: "#fff",
+                fontSize: 10,
+              }
+            }
+          ]
+      },
+      option_multiline_1 : {
+        title: {
+          text: 'Stacked Line',
+          left: '2%',
+          top:'5%',
+          textStyle: {
+            color: "#fff",
+          },
+        },
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine'],
+          right: '0%',
+          top:'center',
+          orient: 'vertical',
+          textStyle: {
+            color: "#fff",
+          },
+        },
+        grid: {
+          left: '5%',
+          right: '20%',
+          bottom: '15%',
+          containLabel: true
+        },
+
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          axisLabel:{
+            color:'#FFF'
+          }
+        },
+        yAxis: {
+          show: false
+        },
+        series: [
+          {
+            name: 'Email',
+            type: 'line',
+            stack: 'Total',
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: 'Union Ads',
+            type: 'line',
+            stack: 'Total',
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: 'Video Ads',
+            type: 'line',
+            stack: 'Total',
+            data: [150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name: 'Direct',
+            type: 'line',
+            stack: 'Total',
+            data: [320, 332, 301, 334, 390, 330, 320]
+          },
+          {
+            name: 'Search Engine',
+            type: 'line',
+            stack: 'Total',
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
+          }
+        ]
+      }
       
     }
   }

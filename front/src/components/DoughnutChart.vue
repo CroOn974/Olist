@@ -27,6 +27,7 @@
             option:{
                 type: Object,
             }
-        }
+        },
     }
+
 </script>

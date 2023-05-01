@@ -61,7 +61,10 @@ export default {
         const minValue = Math.min(...data.map(item => item.value));
         const option = {
           title: {
-            text: 'ECharts Maps basic demo'
+            text: 'ECharts Maps basic demo',
+            textStyle: {
+              color: "#fff",
+            },
           },
           tooltip: {
             trigger: 'item',
