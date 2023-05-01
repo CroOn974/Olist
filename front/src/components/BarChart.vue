@@ -1,29 +1,16 @@
 <template>
-    <Bar
-      id="bar-chart"
-      :options="chartOptions"
-      :data="chartData"
-    />
-  </template>
-  
-  <script>
-  
-  export default {
-    name: 'BarChart',
-    components: { 
-      
-     },
-    data() {
-      return {
-        chartData: {
-          labels: [ 'January', 'February', 'March' ],
-          datasets: [ { data: [40, 20, 12] } ]
-        },
-        chartOptions: {
-            responsive: true,
-            maintainAspectRatio: true,
-        }
-      }
-    }
-  }
-  </script>
+  <div ref="chart" style="width: 100%; height: 500px;"></div>
+</template>
+
+<script>
+import * as echarts from 'echarts';
+
+export default {
+  props: ['option'],
+  mounted() {
+    // création du graphique avec l'option passée en tant que propriété
+    const chart = echarts.init(this.$refs.chart);
+    chart.setOption(this.option);
+  },
+};
+</script>
