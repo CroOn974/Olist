@@ -1,10 +1,10 @@
 from api.models import Files,OrderItem,State,City,Sellers,Customers,OrderPlaced,Products,OrderItem,Payments,Reviews
-from django.db.models import Count, F, Sum
+from django.db.models import Count, F, Sum, Min, Case, When, IntegerField
 import pandas as pd
 import numpy as np
 # API
 from rest_framework import generics
-from api.serializers import CaStateSerializer, FilesSerializer, SoldProductSerializer, EvoStateSerializer, EvoProductSerializer
+from api.serializers import CaStateSerializer, FilesSerializer, SoldProductSerializer, EvoStateSerializer, EvoProductSerializer, TurnoverYearSerializer, NewCustomerSerializer,InterVsExterSerializer 
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework import viewsets
@@ -37,10 +37,6 @@ class ProductByYearViewSet(viewsets.ReadOnlyModelViewSet):
         # Verifie si limit n'est pas null et qu'il est supèrieur a 0
         if limit is not None and limit.isdigit() and int(limit) > 0:
             sales_by_prod = sales_by_prod[:int(limit)]
-        
-        for item in sales_by_prod:
-            print(item)
-
         
         serializer = self.serializer_class(sales_by_prod, many=True)
         return Response(serializer.data)
@@ -90,6 +86,13 @@ class EvoState(viewsets.ReadOnlyModelViewSet):
             .annotate(state_name=F('seller_id__city_id__state__state_name'),year=F('order__order_purchase_timestamp__year'),quantity=Count('order_item_quantity'),turnover=Sum(F('price')*F('order_item_quantity')))\
             .order_by('seller__city__state__state_name', 'order__order_purchase_timestamp__year')
         
+        # version mois
+        # evo_state = OrderItem.objects\
+        #     .filter(seller__city__state__state_name__in=state_list)\
+        #     .annotate(month_year=TruncMonth('order__order_purchase_timestamp'))\
+        #     .values('seller_id__city_id__state__state_name','month_year')\
+        #     .annotate(state_name=F('seller_id__city_id__state__state_name'),date=F('month_year'),quantity=Count('order_item_quantity'),turnover=Sum(F('price')*F('order_item_quantity')))\
+        #     .order_by('seller__city__state__state_name', 'order__order_purchase_timestamp')
         state_dict = {}
         for item in evo_state:
             state_name = item['state_name']
@@ -150,7 +153,98 @@ class EvoProduct(viewsets.ReadOnlyModelViewSet):
         serializer = self.serializer_class(product_list, many=True)
         return Response(serializer.data)
 
+##
+# Renvoye le turnover total
+# EndPoint -> http://localhost:8000/api/turnover-year/<year>/ |ex| http://localhost:8000/api/turnover-year/2016/
+# retourne year, turnover, turnover_percentage, avg_basket
+#
+#
+class TurnoverYear(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TurnoverYearSerializer
+    queryset = OrderItem.objects.none()
 
+    def list(self, request, year):
+        sales_total = OrderItem.objects\
+            .filter(order__order_purchase_timestamp__year=year)\
+            .values('order__order_purchase_timestamp__year')\
+            .annotate(year=F('order__order_purchase_timestamp__year'),turnover=Sum(F('price')*F('order_item_quantity')),invoice_count=Count('order__order_id', distinct=True))\
+            .values('year','turnover','invoice_count')
+        
+        print(sales_total)
+        
+        sales_total_with_percentage = [
+            {
+                'year': item['year'],
+                'turnover': item['turnover'],
+                'turnover_percentage': round(float(item['turnover']) * 0.03, 2),
+                'avg_basket': round(float(item['turnover'])/item['invoice_count'])
+            }
+            for item in sales_total
+        ]
+        
+
+        serializer = self.serializer_class(sales_total_with_percentage, many=True)
+        return Response(serializer.data)
+
+##
+# Renvoye nombre de client
+# EndPoint -> http://localhost:8000/api/customers-year/<year>/ |ex| http://localhost:8000/api/customers-year/2016/
+# retourne year, turnover, turnover_percentage, avg_basket
+#
+#
+class NewCustomerYear(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NewCustomerSerializer
+    queryset = OrderItem.objects.none()
+
+    def list(self, request, year):
+
+        customer_min_dates = OrderPlaced.objects.values('customer').annotate(min_order_date=Min('order_purchase_timestamp'))
+        new_customers = customer_min_dates.filter(min_order_date__year=year) 
+        
+        response_data = {'new_customers_count': new_customers.count()}
+        return Response(response_data)
+
+##
+# Renvoye nombre de commande inter et exter
+# EndPoint -> http://localhost:8000/api/inter-exter/<year>/ |ex| http://localhost:8000/api/inter-exter/2017/
+# retourne year, turnover, turnover_percentage, avg_basket
+#
+#
+class InterVsExter(viewsets.ReadOnlyModelViewSet):
+    serializer_class = InterVsExterSerializer
+    queryset = OrderItem.objects.none()
+
+    def list(self, request, year):
+        # Récupérer les informations de géolocalisation pour chaque commande
+        orders = OrderPlaced.objects \
+            .filter(order_purchase_timestamp__year=year) \
+            .select_related('customer__city__state', 'orderitem__seller__city__state')
+
+        # Compter le nombre de ventes pour chaque catégorie
+        same_region_sales_count = orders \
+            .annotate(same_region=Case(
+                When(customer__city__state_id=F('orderitem__seller__city__state_id'), then=1),
+                default=0,
+                output_field=IntegerField()
+            )) \
+            .aggregate(count=Sum('same_region'))['count'] or 0
+
+        diff_region_sales_count = orders.count() - same_region_sales_count
+
+        interExter = {
+            'year': year,
+            'inter_region': same_region_sales_count,
+            'exter_region': diff_region_sales_count,
+            }
+        
+
+        serializer = self.serializer_class(interExter, many=False)
+        return Response(serializer.data)
+
+
+##
+# Insert Data
+#
 ##
 # Upload Fichier csv
 #
@@ -329,40 +423,6 @@ def insertProduct():
         products_objects = products['product_object'].tolist()
         Products.objects.bulk_create(products_objects)
 
-##
-# Insert la detail de la facture en bdd
-#
-# def insertOrderItem():
-#     orderItem_directory = 'api/upload/olist_order_items_dataset_propre.csv'
-#     orderItem = pd.read_csv(orderItem_directory, encoding='unicode_escape')
-
-#     sellers = pd.DataFrame(list(Sellers.objects.all().values('seller_id')))
-#     products = pd.DataFrame(list(Products.objects.all().values('product_id')))
-#     orders = pd.DataFrame(list(OrderPlaced.objects.all().values('order_id')))
-#     exist_orderItem = pd.DataFrame(list(OrderItem.objects.all().values()))
-
-#     orderItem = orderItem[orderItem['seller_id'].isin(sellers['seller_id'])]
-#     orderItem = orderItem[orderItem['product_id'].isin(products['product_id'])]
-#     orderItem = orderItem[orderItem['order_id'].isin(orders['order_id'])]
-
-
-#     if not exist_orderItem.empty:
-#        orderItem = orderItem[~orderItem[['order_id', 'product_id', 'seller_id']].isin(exist_orderItem[['order_id', 'product_id', 'seller_id']])]
-
-#     if not orderItem.empty:
-        
-#         orderItem_objects = []
-#         for _, row in orderItem.iterrows():
-#             order_placed = OrderPlaced.objects.get(order_id=row['order_id'])
-#             product = Products.objects.get(product_id=row['product_id'])
-#             seller = Sellers.objects.get(seller_id=row['seller_id'])
-
-#             orderItem_object = OrderItem(order=order_placed, product=product, seller=seller, 
-#                                          shipping_limit_date=row['shipping_limit_date'], price=row['price'],
-#                                          freight_value=row['freight_value'], order_item_quantity=row['order_item_quantity'])
-#             orderItem_objects.append(orderItem_object)
-
-#         OrderItem.objects.bulk_create(orderItem_objects)
 
 ##
 # Insert la detail de la facture en bdd
