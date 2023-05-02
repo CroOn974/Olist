@@ -1,5 +1,4 @@
 <template>
-
   <!-- MAIN CONTAINER  -->
   <div class="container bg-slate-900 h-screen overflow-y-hidden">
 
@@ -11,7 +10,7 @@
       <!-- COLONNE 1 -->
       <div class="w-1/4 h-full flex-shrink-0" id="colDough">
         <!-- SELECT ANNEE -->
-        <select class="w-48 h-8 m-4 rounded-xl" v-model="selectedYear" @change="updateDash()">
+        <select class=" h-8 m-4 px-2 rounded-xl" v-model="selectedYear" @change="updateDash()">
           <option v-for="year in years" :value="year" :key="year">{{ year }}</option>
         </select>
         <DoughnutChart class="" :option="option_pie_1"/>
@@ -38,16 +37,16 @@
           <div class="grid grid-cols-2 h-full">
             <div class="rounded-lg p-4">
               <p class="text-gray-50 font-medium mb-8">Panier Moyen</p>
-              <p class="text-gray-50 text-5xl text-center">999 €</p>
+              <p class="text-gray-50 text-5xl text-center">{{turnover[0].avg_basket}}€</p>
             </div>
             <div class="grid grid-rows-2">
               <div class="p-2 border-b-4 border-b-blue-500 border-l-4 border-l-green-400">
                 <p class="text-gray-50 mb-2 font-medium">Bénéfices</p>
-                <p class="text-gray-50 text-3xl text-center">30 €</p>
+                <p class="text-gray-50 text-3xl text-center">{{(turnover[0].avg_basket * 3)/100}}€</p>
               </div>
               <div class="p-2 border-l-4 border-orange-500">
                 <p class="text-gray-50 mb-2 font-medium">Coûts</p>
-                <p class="text-gray-50 text-3xl text-center">969 €</p>
+                <p class="text-gray-50 text-3xl text-center">{{turnover[0].avg_basket - (turnover[0].avg_basket * 3)/100}} €</p>
               </div>
             </div>
           </div>
@@ -57,11 +56,11 @@
           <div class="grid grid-cols-2">
             <div class="mx-4 rounded-lg shadow-lg border-2 border-green-300 h-48 p-4">
               <p class="text-gray-50">Nouveaux Clients</p>
-              <p class="text-gray-50 text-7xl text-center mt-6">999</p>
+              <p class="text-gray-50 text-5xl text-center mt-8">{{newCustomers.new_customers_count}}</p>
             </div>
             <div class="mx-4 rounded-lg shadow-lg border-2 border-blue-500 h-48 pt-4">
               <p class="text-gray-50 text-center">Rebonds</p>
-              <p class="text-gray-50 text-7xl text-center mt-6">999</p>
+              <p class="text-gray-50 text-5xl text-center mt-6">{{newTurnovers}}</p>
             </div>
           </div>
         </div>
@@ -69,31 +68,37 @@
       </div>
 
       <!-- COLONNE 4 -->
-      <div class="w-1/4 flex-shrink-0  bg-slate-800">
-        <MapChart class="h-full"/>
+      <div class="w-1/4 h-min my-auto flex-shrink-0">
+        <div class=" h-min"> 
+          <MapChart class="" :option="mapData"/>
+        </div>
+        
       </div>
+    
     </div>
   </div>
 </template>
 
 <script>
 // import NavBar from '../components/NavBar.vue'
-import BarChart from '../components/BarChart.vue'
 import DoughnutChart from '../components/DoughnutChart.vue'
 import BarChart from '../components/BarChart.vue'
+import MultiLineChart from '../components/MultiLineChart.vue'
+import MapChart from '@/components/MapChart.vue'
 
 export default {
   name: 'HomeView',
   components: { 
     DoughnutChart,
     MultiLineChart,
+    BarChart,
     // NavBar,
     MapChart
   },
   data(){
     return{
-      selectedYear: '',
-      years: ['2017', '2018', '2019'],
+      selectedYear: '2017',
+      years: ['201','2017', '2018', '2019'],
       limit: '5',
       listState : [],
       listProduct : [],
@@ -426,21 +431,19 @@ export default {
             data: [820, 932, 901, 934, 1290, 1330, 1320]
           }
         ]
-      }
-      
+      },
       dataState:[],
       dataProduct:[],
-      barChartOptions: {
-        // les options du graphique
-        title: {
-          text: 'Mon graphique à barres'
-        },
-        xAxis: {
-          data: []
-        },
-        yAxis: {},
-        series: []
+      newCustomers:0,
+      turnover:[
+        {
+        "year": "",
+        "turnover": 0,
+        "turnover_percentage": 0,
+        "avg_basket": 0
       }
+    ],
+    mapData:[],
     }
   }
   ,
@@ -450,12 +453,15 @@ export default {
    * 
    */
   async created(){
-    
+    this.updateDash()
   },
   methods: {
     updateDash(){
       this.topState(this.selectedYear, this.limit)
       this.topProduct(this.selectedYear, this.limit)
+      this.get_new_customers(this.selectedYear)
+      this.get_turnover(this.selectedYear)
+      this.get_map_data(this.selectedYear,9)
     },
     async topState(year, limit){
       
@@ -470,6 +476,7 @@ export default {
       this.evoState()
 
     },
+
     async topProduct(year, limit){
 
       var response = await fetch('http://localhost:8000/api/product-year/'+year+'/'+limit+'');
@@ -482,21 +489,46 @@ export default {
       this.listProduct = data.map((item) => item.product_id);
       this.evoProduct()
     },
+
     async evoState(){
       const states = this.listState.join(',');
       var response = await fetch('http://localhost:8000/api/states-evo/'+states+'/');
       let data = await response.json();
       console.log(data)
       this.dataState = data
-      
-
     },    
+
     async evoProduct(){
       const product = this.listProduct.join(',');
       var response = await fetch('http://localhost:8000/api/product-evo/'+product+'/');
       let data = await response.json();
       console.log(data)
       this.dataProduct = data
+    },
+
+    async get_new_customers(year){
+      var response = await fetch('http://localhost:8000/api/customers-year/'+year+'/');
+      let data = await response.json();
+      console.log(data)
+      this.newCustomers = data
+    },
+    async get_turnover(year){
+      var response = await fetch('http://localhost:8000/api/turnover-year/'+year+'/');
+      let data = await response.json();
+      console.log(data)
+      this.turnover = data
+    },
+    async get_map_data(year,limit){
+      var response = await fetch('http://localhost:8000/api/state-year/'+year+'/'+limit+'');
+      let data = await response.json();
+      console.log(data)
+      this.mapData = []
+      data.forEach(d => {
+        let i = {code:'', value:''}
+        i.code = d.state_name
+        i.value = d.quantity
+        this.mapData.push(i)
+      });
     },
 
   }
