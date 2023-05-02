@@ -64,7 +64,20 @@
             </div>
           </div>
         </div>
-        <BarChart :option="option_bar_2"/>
+
+        <!--  -->
+        <div class="h-48 my-8">
+          <div class="grid grid-cols-2">
+            <div class="mx-4 rounded-lg shadow-lg border-2 border-green-300 h-48 p-4">
+              <p class="text-gray-50">INTER Regions</p>
+              <p class="text-gray-50 text-5xl text-center mt-8">{{inter_exter.inter_region}}</p>
+            </div>
+            <div class="mx-4 rounded-lg shadow-lg border-2 border-blue-500 h-48 pt-4">
+              <p class="text-gray-50 text-center">EXTER Regions</p>
+              <p class="text-gray-50 text-5xl text-center mt-6">{{inter_exter.exter_region}}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- COLONNE 4 -->
@@ -98,7 +111,7 @@ export default {
   data(){
     return{
       selectedYear: '2017',
-      years: ['201','2017', '2018', '2019'],
+      years: ['2016','2017', '2018'],
       limit: '5',
       listState : [],
       listProduct : [],
@@ -444,6 +457,7 @@ export default {
       }
     ],
     mapData:[],
+    inter_exter:[]
     }
   }
   ,
@@ -461,7 +475,8 @@ export default {
       this.topProduct(this.selectedYear, this.limit)
       this.get_new_customers(this.selectedYear)
       this.get_turnover(this.selectedYear)
-      this.get_map_data(this.selectedYear,9)
+      this.get_map_data(this.selectedYear)
+      this.get_inter_exter(this.selectedYear)
     },
     async topState(year, limit){
       
@@ -518,8 +533,8 @@ export default {
       console.log(data)
       this.turnover = data
     },
-    async get_map_data(year,limit){
-      var response = await fetch('http://localhost:8000/api/state-year/'+year+'/'+limit+'');
+    async get_map_data(year){
+      var response = await fetch('http://localhost:8000/api/state-year/'+year+'/');
       let data = await response.json();
       console.log(data)
       this.mapData = []
@@ -529,6 +544,12 @@ export default {
         i.value = d.quantity
         this.mapData.push(i)
       });
+    },
+    async get_inter_exter(year){
+      var response = await fetch('http://localhost:8000/api/inter-exter/'+year+'/');
+      let data = await response.json();
+      console.log(data)
+      this.inter_exter = data
     },
 
   }
